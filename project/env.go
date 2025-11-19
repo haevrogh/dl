@@ -54,8 +54,9 @@ func LoadEnv() {
 		os.Exit(1)
 	}
 
-	setDefaultEnv()
-	setComposeFiles()
+setDefaultEnv()
+setComposeFiles()
+configureVirtualHosts()
 }
 
 // setNetworkName Set network name from project name
@@ -93,7 +94,8 @@ func setDefaultEnv() {
 
 	Env.SetDefault("REDIS", false)
 	Env.SetDefault("REDIS_PASSWORD", "pass")
-	Env.SetDefault("MEMCACHED", false)
+Env.SetDefault("MEMCACHED", false)
+Env.SetDefault("TRAEFIK_EXTRA_RULE", "")
 
 	host := getLocalIP()
 

@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
+	"strings"
 
 	"github.com/local-deploy/dl/utils"
 	"github.com/local-deploy/dl/utils/cert"
@@ -49,10 +50,14 @@ func CreateCert() {
 	certDir := filepath.Join(utils.CertDir(), Env.GetString("NETWORK_NAME"))
 	_ = utils.CreateDirectory(certDir)
 
-	err = c.MakeCert([]string{
+	certHosts := []string{
 		Env.GetString("LOCAL_DOMAIN"),
 		Env.GetString("NIP_DOMAIN"),
-	}, Env.GetString("NETWORK_NAME"))
+	}
+	certHosts = append(certHosts, AdditionalCertificateHosts()...)
+	certHosts = uniqueHosts(certHosts)
+
+	err = c.MakeCert(certHosts, Env.GetString("NETWORK_NAME"))
 	if err != nil {
 		pterm.FgRed.Printfln("Error: %s", err)
 	}
@@ -77,4 +82,22 @@ func CreateCert() {
 	if err != nil {
 		pterm.FgRed.Printfln("failed to create config certificate file: %s", err)
 	}
+}
+
+func uniqueHosts(values []string) []string {
+	seen := map[string]struct{}{}
+	result := make([]string, 0, len(values))
+	for _, value := range values {
+		trimmed := strings.TrimSpace(value)
+		if trimmed == "" {
+			continue
+		}
+		if _, ok := seen[trimmed]; ok {
+			continue
+		}
+		seen[trimmed] = struct{}{}
+		result = append(result, trimmed)
+	}
+
+	return result
 }

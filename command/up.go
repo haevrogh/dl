@@ -133,4 +133,14 @@ func showProjectInfo() {
 	}
 
 	_ = pterm.DefaultPanel.WithPanels(panels).WithPadding(5).Render()
+
+	mappings := project.HostMappings()
+	if len(mappings) > 0 {
+		table := pterm.TableData{{"Host", "Document root"}}
+		for _, mapping := range mappings {
+			table = append(table, []string{mapping.Host, mapping.DocumentRoot})
+		}
+		pterm.Println()
+		_ = pterm.DefaultTable.WithHasHeader().WithData(table).Render()
+	}
 }
